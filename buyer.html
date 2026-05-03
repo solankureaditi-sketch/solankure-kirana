@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Solankure Kirana</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      color: white;
+      text-align: center;
+      background: url('https://images.unsplash.com/photo-1604719312566-8912e9227c6a') no-repeat center center/cover;
+      height: 100vh;
+    }
+
+    .overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.75);
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      padding-top: 20px;
+    }
+
+    .container {
+      margin: auto;
+      width: 380px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 15px;
+    }
+
+    /* 🔥 Header */
+    .header {
+      display: grid;
+      grid-template-columns: 40px 1fr 80px;
+      padding: 10px;
+      font-weight: bold;
+      border-bottom: 2px solid white;
+    }
+
+    /* 🔥 PERFECT ROW ALIGNMENT */
+    .row {
+      display: grid;
+      grid-template-columns: 40px 1fr 80px;
+      align-items: center;
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .checkbox {
+      text-align: center;
+    }
+
+    .item {
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .price {
+      text-align: right;
+      color: #ffd700;
+      font-weight: bold;
+    }
+
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    .row:hover {
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+    }
+
+    .total {
+      margin-top: 15px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .bill-btn { background: #ff9800; color: white; }
+    .order-btn { background: #25D366; color: white; }
+
+    .numbers, .form-box {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .numbers button {
+      background: #333;
+      color: white;
+    }
+
+    input {
+      width: 90%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 10px;
+      border: none;
+    }
+
+    .bill-box {
+      display: none;
+      margin-top: 15px;
+      background: white;
+      color: black;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: left;
+      white-space: pre-line;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="overlay"></div>
+
+<div class="content">
+
+  <h1>Solankure Kirana</h1>
+  <p>Since 1930</p>
+
+  <div class="container">
+
+    <!-- 🔥 HEADER -->
+    <div class="header">
+      <div></div>
+      <div>Item</div>
+      <div style="text-align:right;">Price</div>
+    </div>
+
+    <div id="productList"></div>
+
+    <div class="total">Total: ₹<span id="total">0</span></div>
+
+    <button class="bill-btn" onclick="generateBill()">Generate Bill</button>
+
+    <button class="order-btn" onclick="showForm()">Order</button>
+
+    <!-- 🔥 Buyer Form -->
+    <div class="form-box" id="formBox">
+      <input type="text" id="name" placeholder="Your Name">
+      <input type="text" id="address" placeholder="Your Address">
+      <input type="text" id="mobile" placeholder="Mobile Number">
+
+      <button onclick="showNumbers()">Continue</button>
+    </div>
+
+    <!-- 🔥 WhatsApp Numbers -->
+    <div class="numbers" id="numbers">
+      <button onclick="sendOrder('9590083900')">Umesh Solankure</button>
+      <button onclick="sendOrder('8088802090')">Mahesh Solankure</button>
+    </div>
+
+    <!-- 🔥 BILL -->
+    <div class="bill-box" id="billBox"></div>
+
+  </div>
+
+</div>
+
+<script>
+  let products = JSON.parse(localStorage.getItem("products")) || [];
+
+  let output = "";
+
+  products.forEach(p => {
+    output += `
+      <div class="row">
+        <div class="checkbox">
+          <input type="checkbox" onchange="calculateTotal()" value="${p.buyerPrice}" data-name="${p.name}">
+        </div>
+        <div class="item">${p.name}</div>
+        <div class="price">₹${p.buyerPrice}</div>
+      </div>
+    `;
+  });
+
+  document.getElementById("productList").innerHTML = output;
+
+  function calculateTotal(){
+    let total = 0;
+    document.querySelectorAll("input:checked").forEach(cb => {
+      total += parseInt(cb.value);
+    });
+    document.getElementById("total").innerText = total;
+  }
+
+  function generateBill(){
+    let items = document.querySelectorAll("input:checked");
+
+    if(items.length === 0){
+      alert("Select items first");
+      return;
+    }
+
+    let bill = "🧾 Solankure Kirana\nSince 1930\n\n";
+
+    items.forEach(cb => {
+      bill += cb.dataset.name + " - ₹" + cb.value + "\n";
+    });
+
+    bill += "\nTotal: ₹" + document.getElementById("total").innerText;
+
+    document.getElementById("billBox").style.display = "block";
+    document.getElementById("billBox").innerText = bill;
+  }
+
+  function showForm(){
+    let bill = document.getElementById("billBox").innerText;
+
+    if(bill === ""){
+      alert("Generate bill first");
+      return;
+    }
+
+    document.getElementById("formBox").style.display = "block";
+  }
+
+  function showNumbers(){
+    let name = document.getElementById("name").value;
+    let address = document.getElementById("address").value;
+    let mobile = document.getElementById("mobile").value;
+
+    if(name === "" || address === "" || mobile === ""){
+      alert("Fill all details");
+      return;
+    }
+
+    document.getElementById("numbers").style.display = "block";
+  }
+
+  function sendOrder(number){
+    let bill = document.getElementById("billBox").innerText;
+
+    let name = document.getElementById("name").value;
+    let address = document.getElementById("address").value;
+    let mobile = document.getElementById("mobile").value;
+
+    let fullMsg = bill + "\n\n👤 Name: " + name +
+                  "\n📍 Address: " + address +
+                  "\n📞 Mobile: " + mobile;
+
+    let encoded = encodeURIComponent(fullMsg);
+
+    window.location.href = "https://wa.me/91" + number + "?text=" + encoded;
+  }
+
+</script>
+
+</body>
+</html>

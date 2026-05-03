@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Owner Panel</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: linear-gradient(to right, #11998e, #38ef7d);
+      color: white;
+    }
+
+    .container {
+      margin: auto;
+      width: 380px;
+      background: rgba(255,255,255,0.1);
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 40px;
+    }
+
+    input {
+      padding: 8px;
+      margin: 5px;
+      border-radius: 10px;
+      border: none;
+      width: 90%;
+    }
+
+    button {
+      padding: 8px 15px;
+      margin-top: 8px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .add { background: #ff9800; color: white; }
+    .save { background: #4caf50; color: white; }
+    .remove { background: red; color: white; }
+
+    .product-box {
+      background: rgba(255,255,255,0.15);
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 12px;
+      text-align: left;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+    }
+
+    label {
+      font-size: 14px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>🏪 Add Product</h2>
+
+  <input type="text" id="name" placeholder="Item Name"><br>
+  <input type="number" id="realPrice" placeholder="Real Price"><br>
+  <input type="number" id="buyerPrice" placeholder="Buyer Price"><br>
+
+  <button class="add" onclick="addProduct()">Add</button>
+
+  <h3>Products</h3>
+
+  <div id="list"></div>
+
+</div>
+
+<script>
+  let products = JSON.parse(localStorage.getItem("products")) || [];
+
+  function showProducts(){
+    let output = "";
+
+    products.forEach((p, i) => {
+      output += `
+        <div class="product-box">
+
+          <div class="row">
+            <label>Item:</label>
+            <input type="text" id="name${i}" value="${p.name}">
+          </div>
+
+          <div class="row">
+            <label>Real Price:</label>
+            <input type="number" id="real${i}" value="${p.realPrice}">
+          </div>
+
+          <div class="row">
+            <label>Buyer Price:</label>
+            <input type="number" id="buyer${i}" value="${p.buyerPrice}">
+          </div>
+
+          <button class="save" onclick="updateProduct(${i})">Save</button>
+          <button class="remove" onclick="deleteProduct(${i})">Remove</button>
+
+        </div>
+      `;
+    });
+
+    document.getElementById("list").innerHTML = output;
+  }
+
+  function addProduct(){
+    let name = document.getElementById("name").value;
+    let realPrice = document.getElementById("realPrice").value;
+    let buyerPrice = document.getElementById("buyerPrice").value;
+
+    if(name === "" || realPrice === "" || buyerPrice === ""){
+      alert("Enter all details");
+      return;
+    }
+
+    products.push({name, realPrice, buyerPrice});
+    localStorage.setItem("products", JSON.stringify(products));
+
+    // clear input
+    document.getElementById("name").value = "";
+    document.getElementById("realPrice").value = "";
+    document.getElementById("buyerPrice").value = "";
+
+    showProducts();
+  }
+
+  function updateProduct(index){
+    products[index].name = document.getElementById("name"+index).value;
+    products[index].realPrice = document.getElementById("real"+index).value;
+    products[index].buyerPrice = document.getElementById("buyer"+index).value;
+
+    localStorage.setItem("products", JSON.stringify(products));
+
+    alert("Updated Successfully");
+  }
+
+  function deleteProduct(index){
+    if(confirm("Delete this item?")){
+      products.splice(index, 1);
+      localStorage.setItem("products", JSON.stringify(products));
+      showProducts();
+    }
+  }
+
+  showProducts();
+</script>
+
+</body>
+</html>
